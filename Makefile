@@ -34,3 +34,8 @@ clean:
 	rm -rf build
 
 .PHONY: all clean
+# UniFlash CLI yolu (kurulu olduğu dizini kontrol et)
+DSLITE  = $(HOME)/ti/uniflash_8.5.0/dslite.sh
+
+flash: $(TARGET).elf
+	$(DSLITE) --config=TMS570LC43xx.ccxml -f $(PWD)/$(TARGET).elf
