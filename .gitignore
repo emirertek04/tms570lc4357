@@ -1,0 +1,8 @@
+cat << 'EOF' > .gitignore
+build/
+*.o
+*.elf
+*.bin
+*.map
+.vscode/
+EOF
