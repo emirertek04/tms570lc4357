@@ -2,8 +2,11 @@ CC      = arm-none-eabi-gcc
 OBJCOPY = arm-none-eabi-objcopy
 SIZE    = arm-none-eabi-size
 
-CFLAGS  = -mcpu=cortex-r5 -marm -Wall -O0 -g -Iinclude
-LDFLAGS = -Tlinker/tms570lc4357.ld -nostartfiles -Wl,-Map=build/output.map
+# TMS570 serisi TI ve UniFlash tarafında Big Endian (BE-32) bekler
+CPU_FLAGS = -mcpu=cortex-r5 -marm -mbig-endian
+
+CFLAGS  = $(CPU_FLAGS) -Wall -O0 -g -Iinclude
+LDFLAGS = $(CPU_FLAGS) -Wl,-EB -Tlinker/tms570lc4357.ld -nostartfiles -Wl,-Map=build/output.map
 
 SRCS_C  = src/system.c src/gio.c src/main.c
 SRCS_S  = src/startup.s
@@ -24,7 +27,7 @@ build/%.o: src/%.s | build
 	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $@
 
 $(TARGET).elf: $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
+	$(CC) $(LDFLAGS) $^ -o $@
 	$(SIZE) $@
 
 $(TARGET).bin: $(TARGET).elf
@@ -34,8 +37,3 @@ clean:
 	rm -rf build
 
 .PHONY: all clean
-# UniFlash CLI yolu (kurulu olduğu dizini kontrol et)
-DSLITE  = $(HOME)/ti/uniflash_8.5.0/dslite.sh
-
-flash: $(TARGET).elf
-	$(DSLITE) --config=TMS570LC43xx.ccxml -f $(PWD)/$(TARGET).elf
